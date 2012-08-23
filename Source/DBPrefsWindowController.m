@@ -26,16 +26,20 @@
 #pragma mark -
 #pragma mark Class Methods
 
-+ (DBPrefsWindowController *)sharedPrefsWindowController{
-    static DBPrefsWindowController *_sharedPrefsWindowController = nil;    
-	if(!_sharedPrefsWindowController){
++ (DBPrefsWindowController *)sharedPrefsWindowController
+{
+    static DBPrefsWindowController *_sharedPrefsWindowController = nil;
+	
+	if(!_sharedPrefsWindowController)
+	{
 		_sharedPrefsWindowController = [[self alloc] initWithWindowNibName:[self nibName]];
 	}
 	return _sharedPrefsWindowController;
 }
 
 // Subclasses can override this to use a nib with a different name.
-+ (NSString *)nibName{
++ (NSString *)nibName
+{
    return @"Preferences";
 }
 
@@ -43,8 +47,10 @@
 #pragma mark -
 #pragma mark Setup & Teardown
 
-- (id)initWithWindow:(NSWindow *)window{
-	if((self = [super initWithWindow:nil])){
+- (id)initWithWindow:(NSWindow *)window
+{
+	if ((self = [super initWithWindow:nil]))
+	{
         // Set up an array and some dictionaries to keep track
         // of the views we'll be displaying.
         self.toolbarIdentifiers = [[NSMutableArray alloc] init];
@@ -60,10 +66,12 @@
         self.crossFade = YES;
         self.shiftSlowsAnimation = YES;
 	}
+	
 	return self;
 }
 
-- (void)windowDidLoad{
+- (void)windowDidLoad
+{
     // Create a new window to display the preference views.
     // If the developer attached a window to this controller
     // in Interface Builder, it gets replaced with this one.
@@ -85,7 +93,8 @@
 #pragma mark -
 #pragma mark Configuration
 
-- (void)setupToolbar{
+- (void)setupToolbar
+{
     // Subclasses must override this method to add items to the
     // toolbar by calling -addView:label: or -addView:label:image:.
 }
@@ -93,7 +102,8 @@
 - (void)addToolbarItemForIdentifier:(NSString *)identifier
                               label:(NSString *)label
                               image:(NSImage *)image
-                           selector:(SEL)selector {
+                           selector:(SEL)selector
+{
     [self.toolbarIdentifiers addObject:identifier];
     
     NSToolbarItem *item = [[NSToolbarItem alloc] initWithItemIdentifier:identifier];
@@ -105,16 +115,20 @@
     (self.toolbarItems)[identifier] = item;
 }
 
-- (void)addFlexibleSpacer {
+- (void)addFlexibleSpacer
+{
     [self addToolbarItemForIdentifier:NSToolbarFlexibleSpaceItemIdentifier label:nil image:nil selector:nil];
 }
 
-- (void)addView:(NSView *)view label:(NSString *)label{
+- (void)addView:(NSView *)view label:(NSString *)label
+{
     [self addView:view label:label image:[NSImage imageNamed:label]];
 }
 
-- (void)addView:(NSView *)view label:(NSString *)label image:(NSImage *)image{
-    if(view == nil){
+- (void)addView:(NSView *)view label:(NSString *)label image:(NSImage *)image
+{
+    if (view == nil)
+	{
         return;
     }
 	
@@ -130,7 +144,8 @@
 #pragma mark -
 #pragma mark Overriding Methods
 
-- (IBAction)showWindow:(id)sender{
+- (IBAction)showWindow:(id)sender
+{
     // This forces the resources in the nib to load.
     [self window];
 
@@ -140,17 +155,21 @@
     [self.toolbarItems removeAllObjects];
     [self setupToolbar];
 
-    if(![_toolbarIdentifiers count]){
+    if(![_toolbarIdentifiers count])
+	{
         return;
     }
 
-    if([[self window] toolbar] == nil){
+    if([[self window] toolbar] == nil)
+	{
         NSToolbar *toolbar = [[NSToolbar alloc] initWithIdentifier:@"DBPreferencesToolbar"];
+		
         [toolbar setAllowsUserCustomization:NO];
         [toolbar setAutosavesConfiguration:NO];
         [toolbar setSizeMode:NSToolbarSizeModeDefault];
         [toolbar setDisplayMode:NSToolbarDisplayModeIconAndLabel];
         [toolbar setDelegate:(id<NSToolbarDelegate>)self];
+		
         [[self window] setToolbar:toolbar];
     }
 
@@ -167,15 +186,18 @@
 #pragma mark -
 #pragma mark Toolbar
 
-- (NSArray *)toolbarDefaultItemIdentifiers:(NSToolbar*)toolbar{
+- (NSArray *)toolbarDefaultItemIdentifiers:(NSToolbar*)toolbar
+{
 	return self.toolbarIdentifiers;
 }
 
-- (NSArray *)toolbarAllowedItemIdentifiers:(NSToolbar*)toolbar{
+- (NSArray *)toolbarAllowedItemIdentifiers:(NSToolbar*)toolbar
+{
 	return self.toolbarIdentifiers;
 }
 
-- (NSArray *)toolbarSelectableItemIdentifiers:(NSToolbar *)toolbar{
+- (NSArray *)toolbarSelectableItemIdentifiers:(NSToolbar *)toolbar
+{
 	return self.toolbarIdentifiers;
 }
 
@@ -183,17 +205,20 @@
 	return (self.toolbarItems)[identifier];
 }
 
-- (void)toggleActivePreferenceView:(NSToolbarItem *)toolbarItem{
+- (void)toggleActivePreferenceView:(NSToolbarItem *)toolbarItem
+{
 	[self displayViewForIdentifier:[toolbarItem itemIdentifier] animate:YES];
 }
 
-- (void)displayViewForIdentifier:(NSString *)identifier animate:(BOOL)animate{	
+- (void)displayViewForIdentifier:(NSString *)identifier animate:(BOOL)animate
+{
     // Find the view we want to display.
     NSView *newView = (self.toolbarViews)[identifier];
 
     // See if there are any visible views.
     NSView *oldView = nil;
-    if([[self.contentSubview subviews] count] > 0) {
+    if ([[self.contentSubview subviews] count] > 0)
+	{
         // Get a list of all of the views in the window. Usually at this
         // point there is just one visible view. But if the last fade
         // hasn't finished, we need to get rid of it now before we move on.
@@ -204,21 +229,27 @@
 
         // Remove any others.
         NSView *reallyOldView = nil;
-        while((reallyOldView = [subviewsEnum nextObject]) != nil){
+        while((reallyOldView = [subviewsEnum nextObject]) != nil)
+		{
             [reallyOldView removeFromSuperviewWithoutNeedingDisplay];
         }
     }
 
-    if(![newView isEqualTo:oldView]){
+    if(![newView isEqualTo:oldView])
+	{
         NSRect frame = [newView bounds];
         frame.origin.y = NSHeight([self.contentSubview frame]) - NSHeight([newView bounds]);
         [newView setFrame:frame];
+		
         [self.contentSubview addSubview:newView];
         [[self window] setInitialFirstResponder:newView];
 
-        if(animate && [self crossFade]){
+        if(animate && [self crossFade])
+		{
             [self crossFadeView:oldView withView:newView];
-        }else{
+        }
+		else
+		{
             [oldView removeFromSuperviewWithoutNeedingDisplay];
             [newView setHidden:NO];
             [[self window] setFrame:[self frameForView:newView] display:YES animate:animate];
@@ -228,7 +259,8 @@
     }
 }
 
-- (void)loadViewForIdentifier:(NSString *)identifier animate:(BOOL)animate {
+- (void)loadViewForIdentifier:(NSString *)identifier animate:(BOOL)animate
+{
     [[[self window] toolbar] setSelectedItemIdentifier:identifier];
     [self displayViewForIdentifier:identifier animate:animate];
 }
@@ -240,29 +272,32 @@
 - (void)crossFadeView:(NSView *)oldView withView:(NSView *)newView{
     [self.viewAnimation stopAnimation];
 
-    if([self shiftSlowsAnimation] && [[[self window] currentEvent] modifierFlags] & NSShiftKeyMask){
+    if ([self shiftSlowsAnimation] && [[[self window] currentEvent] modifierFlags] & NSShiftKeyMask)
+	{
         [self.viewAnimation setDuration:1.25];
-    }else{
+    }
+	else
+	{
         [self.viewAnimation setDuration:0.25];
     }
 
     NSDictionary *fadeOutDictionary = 
-    @{NSViewAnimationTargetKey: oldView,
-     NSViewAnimationEffectKey: NSViewAnimationFadeOutEffect};
+    	@{NSViewAnimationTargetKey: oldView,
+     	NSViewAnimationEffectKey: NSViewAnimationFadeOutEffect};
 
     NSDictionary *fadeInDictionary = 
-    @{NSViewAnimationTargetKey: newView,
-     NSViewAnimationEffectKey: NSViewAnimationFadeInEffect};
+    	@{NSViewAnimationTargetKey: newView,
+     	NSViewAnimationEffectKey: NSViewAnimationFadeInEffect};
 
     NSDictionary *resizeDictionary = 
-    @{NSViewAnimationTargetKey: [self window],
-     NSViewAnimationStartFrameKey: [NSValue valueWithRect:[[self window] frame]],
-     NSViewAnimationEndFrameKey: [NSValue valueWithRect:[self frameForView:newView]]};
+    	@{NSViewAnimationTargetKey: [self window],
+     	NSViewAnimationStartFrameKey: [NSValue valueWithRect:[[self window] frame]],
+     	NSViewAnimationEndFrameKey: [NSValue valueWithRect:[self frameForView:newView]]};
 
     NSArray *animationArray = 
-    @[fadeOutDictionary,
-     fadeInDictionary,
-     resizeDictionary];
+    	@[fadeOutDictionary,
+     	fadeInDictionary,
+     	resizeDictionary];
 
     [self.viewAnimation setViewAnimations:animationArray];
     [self.viewAnimation startAnimation];
@@ -281,7 +316,8 @@
     // Remove everything else. There should be just one, but
     // if the user does a lot of fast clicking, we might have
     // more than one to remove.
-    while((subview = [subviewsEnum nextObject]) != nil){
+    while((subview = [subviewsEnum nextObject]) != nil)
+	{
         [subview removeFromSuperviewWithoutNeedingDisplay];
     }
 
@@ -291,7 +327,8 @@
 }
 
 // Calculate the window size for the new view.
-- (NSRect)frameForView:(NSView *)view{
+- (NSRect)frameForView:(NSView *)view
+{
 	NSRect windowFrame = [[self window] frame];
 	NSRect contentRect = [[self window] contentRectForFrameRect:windowFrame];
 	float windowTitleAndToolbarHeight = NSHeight(windowFrame) - NSHeight(contentRect);
@@ -304,11 +341,15 @@
 }
 
 // Close the window with cmd+w incase the app doesn't have an app menu
-- (void)keyDown:(NSEvent *)theEvent{
+- (void)keyDown:(NSEvent *)theEvent
+{
     NSString *key = [theEvent charactersIgnoringModifiers];
-    if(([theEvent modifierFlags] & NSCommandKeyMask) && [key isEqualToString:@"w"]){
+    if (([theEvent modifierFlags] & NSCommandKeyMask) && [key isEqualToString:@"w"])
+	{
         [self close];
-    }else{
+    }
+	else
+	{
         [super keyDown:theEvent];
     }
 }

@@ -12,7 +12,8 @@
 @synthesize updatesPreferenceView = _updatesPreferenceView;
 @synthesize advancedPreferenceView = _advancedPreferenceView;
 
-- (void)setupToolbar{
+- (void)setupToolbar
+{
     [self addView:self.generalPreferenceView label:@"General"];
     [self addView:self.colorsPreferenceView label:@"Colors"];
     [self addView:self.playbackPreferenceView label:@"Playback"];
