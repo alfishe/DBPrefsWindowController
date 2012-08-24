@@ -34,6 +34,7 @@
 	{
 		_sharedPrefsWindowController = [[self alloc] initWithWindowNibName:[self nibName]];
 	}
+	
 	return _sharedPrefsWindowController;
 }
 
@@ -83,9 +84,11 @@
                                   backing:NSBackingStoreBuffered
                                     defer:YES];
     [self setWindow:window];
+	
     self.contentSubview = [[NSView alloc] initWithFrame:[[[self window] contentView] frame]];
     [self.contentSubview setAutoresizingMask:(NSViewMinYMargin | NSViewWidthSizable)];
-    [[[self window] contentView] addSubview:self.contentSubview];
+    
+	[[[self window] contentView] addSubview:self.contentSubview];
     [[self window] setShowsToolbarButton:NO];
 }
 
@@ -120,6 +123,9 @@
     [self addToolbarItemForIdentifier:NSToolbarFlexibleSpaceItemIdentifier label:nil image:nil selector:nil];
 }
 
+///
+/// Add tab to the toolbar. Image name will be similar to label value
+///
 - (void)addView:(NSView *)view label:(NSString *)label
 {
     [self addView:view label:label image:[NSImage imageNamed:label]];
@@ -128,16 +134,15 @@
 - (void)addView:(NSView *)view label:(NSString *)label image:(NSImage *)image
 {
     if (view == nil)
-	{
         return;
-    }
 	
     NSString *identifier = [label copy];
+	
     (self.toolbarViews)[identifier] = view;
     [self addToolbarItemForIdentifier:identifier
-                                label:label
-                                image:image
-                             selector:@selector(toggleActivePreferenceView:)];
+		label:label
+		image:image
+		selector:@selector(toggleActivePreferenceView:)];
 }
 
 
@@ -217,6 +222,7 @@
 
     // See if there are any visible views.
     NSView *oldView = nil;
+	
     if ([[self.contentSubview subviews] count] > 0)
 	{
         // Get a list of all of the views in the window. Usually at this
@@ -229,13 +235,14 @@
 
         // Remove any others.
         NSView *reallyOldView = nil;
-        while((reallyOldView = [subviewsEnum nextObject]) != nil)
+		
+        while ((reallyOldView = [subviewsEnum nextObject]) != nil)
 		{
             [reallyOldView removeFromSuperviewWithoutNeedingDisplay];
         }
     }
 
-    if(![newView isEqualTo:oldView])
+    if (![newView isEqualTo:oldView])
 	{
         NSRect frame = [newView bounds];
         frame.origin.y = NSHeight([self.contentSubview frame]) - NSHeight([newView bounds]);
@@ -244,7 +251,7 @@
         [self.contentSubview addSubview:newView];
         [[self window] setInitialFirstResponder:newView];
 
-        if(animate && [self crossFade])
+        if (animate && [self crossFade])
 		{
             [self crossFadeView:oldView withView:newView];
         }
@@ -269,7 +276,8 @@
 #pragma mark -
 #pragma mark Cross-Fading Methods
 
-- (void)crossFadeView:(NSView *)oldView withView:(NSView *)newView{
+- (void)crossFadeView:(NSView *)oldView withView:(NSView *)newView
+{
     [self.viewAnimation stopAnimation];
 
     if ([self shiftSlowsAnimation] && [[[self window] currentEvent] modifierFlags] & NSShiftKeyMask)
@@ -303,7 +311,8 @@
     [self.viewAnimation startAnimation];
 }
 
-- (void)animationDidEnd:(NSAnimation *)animation{
+- (void)animationDidEnd:(NSAnimation *)animation
+{
     NSView *subview;
 
     // Get a list of all of the views in the window. Hopefully
@@ -316,7 +325,7 @@
     // Remove everything else. There should be just one, but
     // if the user does a lot of fast clicking, we might have
     // more than one to remove.
-    while((subview = [subviewsEnum nextObject]) != nil)
+    while ((subview = [subviewsEnum nextObject]) != nil)
 	{
         [subview removeFromSuperviewWithoutNeedingDisplay];
     }
@@ -344,6 +353,7 @@
 - (void)keyDown:(NSEvent *)theEvent
 {
     NSString *key = [theEvent charactersIgnoringModifiers];
+	
     if (([theEvent modifierFlags] & NSCommandKeyMask) && [key isEqualToString:@"w"])
 	{
         [self close];
